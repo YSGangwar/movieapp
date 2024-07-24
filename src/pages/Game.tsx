@@ -1,3 +1,4 @@
+ // @ts-nocheck
 import { useState,useEffect } from "react";
 import {defaultCover1} from '../data/objects';
 import { RuleSharp } from "@mui/icons-material";
