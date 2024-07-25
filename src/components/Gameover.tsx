@@ -5,7 +5,7 @@ import animationData from '../data/Animation - 1721813459789.json';
 import timeDifference from '../utils/calculateTIme';
 import { Navigate } from 'react-router-dom';
 ;
-const GameOver = ({counts, time }) => {
+const GameOver = ({counts, time ,clearStates}) => {
   const defaultOptions = {
     loop: true,
     autoplay: true,
@@ -22,8 +22,8 @@ const GameOver = ({counts, time }) => {
       <h4> Total Clicks Taken :  {counts} </h4>
       <h4> Total Time Taken :{ timeDifference(endTime,time) } Seconds</h4>
       <button
-        onClick={()=><Navigate  to="/"/>}
-        className='border-2 p-4 text-xl bg-red-600 border-black hover:scale-105 duration-300'
+        onClick={clearStates}
+        className='border-2 p-4 text-sm mt-4  rounded-[22px] bg-orange-600 border-black hover:scale-105 duration-300'
       > Play again </button>
       <Lottie options={defaultOptions} height={400} width={400} />
     </div>
