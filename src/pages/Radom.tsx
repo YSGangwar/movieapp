@@ -5,6 +5,9 @@ import { Game } from './Game';
 export const Radom = () => {
     const  jaehaerys = "https://i0.wp.com/wikiofthrones.com/wp-content/uploads/2022/10/Jaehaerys-I-Targaryens-rule-3885038.jpg?w=830&ssl=1";
 
+
+    const colors = ["red","blue","yellow","lime","orange","teal","purple","aqua"]
+
     const dragons = [
         { title: "Balerion", img: balerion },
         { title: "Vermithor", img: vermithor },
@@ -41,6 +44,7 @@ export const Radom = () => {
             riders={riders}
             dragons={dragons}
             shuffleCombined={shuffleCombined}
+            colors={colors}
         />
     )
 }

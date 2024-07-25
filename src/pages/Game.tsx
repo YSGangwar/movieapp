@@ -1,26 +1,12 @@
 import { useState,useEffect } from "react";
 import {defaultCover1} from '../data/objects';
 import GameOver from "../components/Gameover";
-interface CP  { 
-    [key: string]: string 
-};
-interface RIDERS {
-    title:string;
-    index:number;
-}
-interface BASIC {
-    title:string;
-    img:string;
-}
-interface FLIPPED {    
-    [key: number]: boolean;
-      
-}
+import { CP , RIDERS , BASIC, FLIPPED, COLOR_PROPS} from '../utils/Interfaces'
 export const Game = (props:any) =>{
     
     const [ answer , setCorrectAnswer]= useState(0);
   
-    const {riders,dragons , shuffleCombined} = props;
+    const {riders,dragons , shuffleCombined , colors} = props;
     // console.log(shuffleCombined)
     
     const [time ,setTime] = useState<Date>();
@@ -34,6 +20,7 @@ export const Game = (props:any) =>{
     const [ firstSelected , setFirstSelected] = useState<string | null >();
     const [ riderValue , setRiderValue] = useState({name:"",index:0});
     const [ dontShow , setDontShow ] = useState<FLIPPED>({});
+    const [ showColor , setShowColor] = useState<COLOR_PROPS>({});
     const [counter, setCounter] = useState(0);
 
     const handleFlip = (index:number) => {
@@ -87,7 +74,12 @@ export const Game = (props:any) =>{
                             [index]:true,
                             [riderValue.index]:true
                         });
-                        setCorrectAnswer(answer+1)
+                        setCorrectAnswer(answer+1);
+                        setShowColor({
+                            ...showColor,
+                            [index]:colors[answer+1],
+                            [riderValue.index]:colors[answer+1]
+                        });
                         setDragonValue({name:"",index:0});
                         setRiderValue({name:"",index:0});
                         setFirstSelected(null);
@@ -115,6 +107,11 @@ export const Game = (props:any) =>{
                             [index]:true,
                             [dragonValue.index]:true
                         })
+                        setShowColor({
+                            ...showColor,
+                            [index]:colors[answer+1],
+                            [dragonValue.index]:colors[answer+1]
+                        });
                         setCorrectAnswer(answer+1);
                         setRiderValue({name:"",index:0});
                         setDragonValue({name:"",index:0});
@@ -146,6 +143,7 @@ export const Game = (props:any) =>{
         setDragonValue({name:"",index:0});
         setFirstSelected(null);
         setCounter(0);
+        setShowColor({})
     }
 
     useEffect(() => {
@@ -173,10 +171,11 @@ export const Game = (props:any) =>{
             {shuffleCombined.map((item:BASIC, index:number) => (
                 <div
                 key={index}
+                style={{borderRadius:"22px" , boxShadow: `0 4px 8px 0 ${showColor[index]}, 0 6px 20px 0 ${showColor[index]} `}}
                 className={`flip-card ${ flippedCards[index] ? 'flipped' : ''}`}
                 onClick={ dontShow[index] ? undefined  :() => handleSubmit(item.title,index)}
                 >
-                <div className="flip-card-inner">
+                <div className="flip-card-inner rounded-md">
                     <div
                     className="flip-card-front"
                     style={{ backgroundImage: `url(${defaultCover1})` }}

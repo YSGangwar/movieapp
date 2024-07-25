@@ -12,4 +12,7 @@ interface BASIC {
 interface FLIPPED {    
     [key: number]: boolean;
 }
-export type  {CP,RIDERS,BASIC,FLIPPED};
+interface COLOR_PROPS {
+    [key:number]:string;
+}
+export type  {CP,RIDERS,BASIC,FLIPPED,COLOR_PROPS};
