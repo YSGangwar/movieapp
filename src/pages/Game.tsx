@@ -1,176 +1,173 @@
- // @ts-nocheck
-import { useState,useEffect } from "react";
-import {defaultCover1} from '../data/objects';
+import { useState, useEffect } from "react";
+import { defaultCover1 } from '../data/objects';
 import GameOver from "../components/Gameover";
-export const Game = (props:any) =>{
+
+interface CP { 
+    [key: string]: string 
+};
+interface RIDERS {
+    title: string;
+    index: number;
+}
+interface BASIC {
+    title: string;
+    img: string;
+}
+interface FLIPPED {    
+    [key: number]: boolean;
+}
+export const Game = (props: any) => {
+    const [answer, setCorrectAnswer] = useState(0);
+    const { riders, dragons, shuffleCombined } = props;
     
-    const [ answer , setCorrectAnswer]= useState(0);
-  
-    const {riders,dragons , shuffleCombined} = props;
-    // console.log(shuffleCombined)
-    
-    const [time ,setTime] = useState();
-    const combinedPairs = riders.map((rider,index)=>{
-        return {[rider.title]:dragons[index].title}
+    const [time, setTime] = useState<Date>();
+    const combinedPairs = riders.map((rider: RIDERS, index: number) => {
+        return { [rider.title]: dragons[index].title }
     });
 
-    console.log(combinedPairs);
-
-    //functions
-    const [flippedCards, setFlippedCards] = useState({});
-    const [ dragonValue , setDragonValue] = useState({name:"",index:0});
-    const [ firstSelected , setFirstSelected] = useState<string | null >();
-    const [ riderValue , setRiderValue] = useState({name:"",index:0});
-    const [ dontShow , setDontShow ] = useState({});
+    const [flippedCards, setFlippedCards] = useState<FLIPPED>({});
+    const [dragonValue, setDragonValue] = useState({ name: "", index: 0 });
+    const [firstSelected, setFirstSelected] = useState<string | null>();
+    const [riderValue, setRiderValue] = useState({ name: "", index: 0 });
+    const [dontShow, setDontShow] = useState<FLIPPED>({});
     const [counter, setCounter] = useState(0);
-    
-    // const startTime=0 ;
-    const handleFlip = (index) => {
-      setFlippedCards({
-        ...flippedCards,
-        [index]: !flippedCards[index]
-      });
+    const [disableClick, setDisableClick] = useState(false);
+
+    const handleFlip = (index: number) => {
+        setFlippedCards({
+            ...flippedCards,
+            [index]: !flippedCards[index]
+        });
     };
 
-    const findRider = (key) => {
-        const result = combinedPairs.find(item =>Object.values(item)[0] === key);
-        return result ? Object.keys(result)[0] : -1;    
+    const findRider = (key: string) => {
+        const result = combinedPairs.find((item: CP) => Object.values(item)[0] === key);
+        return result ? Object.keys(result)[0] : -1;
     };
 
-    const findDragon = (key) => {
-        const result = combinedPairs.find(rider => Object.keys(rider)[0] === key);
+    const findDragon = (key: string) => {
+        const result = combinedPairs.find((rider: CP) => Object.keys(rider)[0] === key);
         return result ? result[key] : -1;
     };
-    
 
-    const ifDragon =(value)=>{
-        const result = dragons.find(dragon=>dragon.title===value);
+    const ifDragon = (value: string) => {
+        const result = dragons.find((dragon: RIDERS) => dragon.title === value);
         return result ? true : false;
     }
 
-    
-    const handleSubmit = (title,index) =>{
+    const handleSubmit = (title: string, index: number) => {
+        if (disableClick) return; 
 
-        if(counter==1){
+        if (counter === 1) {
             const startTime = new Date();
-            setTime(startTime)
-           
+            setTime(startTime);
         }
 
         handleFlip(index);
-        setCounter(counter+1);
-        console.log("Title",title);
-        if(ifDragon(title)){
-            if(!firstSelected){
-                setDragonValue({name:title,index:index});
+        setCounter(counter + 1);
+        console.log("Title", title);
+
+        if (ifDragon(title)) {
+            if (!firstSelected) {
+                setDragonValue({ name: title, index: index });
                 setFirstSelected("dragon");
-            }
-            else {
-                if( firstSelected==="rider"){
+            } else {
+                if (firstSelected === "rider") {
                     console.log(riderValue);
-                    if(riderValue.name === findRider(title)){
-                        console.log("Match Successfull");
+                    if (riderValue.name === findRider(title)) {
+                        console.log("Match Successful");
                         setDontShow({
                             ...dontShow,
-                            [index]:true,
-                            [riderValue.index]:true
+                            [index]: true,
+                            [riderValue.index]: true
                         });
-                        setCorrectAnswer(answer+1)
-                        setDragonValue({name:"",index:0});
-                        setRiderValue({name:"",index:0});
-                        setFirstSelected(null);
-                    }
-                    else{
-                        console.log("Wrong answer select another Dragon")
+                        setCorrectAnswer(answer + 1);
+                        resetSelection();
+                    } else {
+                        console.log("Wrong answer, select another Dragon");
+                        resetSelection();
                     }
                 } else {
-                    console.log("cant Pick same type");
+                    console.log("Can't pick same type");
+                    resetSelection();
                 }
             }
-        }
-        else{
-            if(!firstSelected){
-                setRiderValue({name:title,index:index});
+        } else {
+            if (!firstSelected) {
+                setRiderValue({ name: title, index: index });
                 setFirstSelected("rider");
-            }
-            else {   
-                if( firstSelected==="dragon"){
-                    if(dragonValue.name === findDragon(title)){
-                        
-                        console.log("Match successfull again");
+            } else {   
+                if (firstSelected === "dragon") {
+                    if (dragonValue.name === findDragon(title)) {
+                        console.log("Match successful");
                         setDontShow({
                             ...dontShow,
-                            [index]:true,
-                            [dragonValue.index]:true
-                        })
-                        setCorrectAnswer(answer+1);
-                        setRiderValue({name:"",index:0});
-                        setDragonValue({name:"",index:0});
-                        setFirstSelected(null)
-                        // otherCardsFlip()
-
+                            [index]: true,
+                            [dragonValue.index]: true
+                        });
+                        setCorrectAnswer(answer + 1);
+                        resetSelection();
+                    } else {
+                        console.log("Wrong answer, select another Rider");
+                        resetSelection();
                     }
-                    else{
-                        console.log("Wrong answer select another Rider")
-                    }
-                }
-                else{
-                    console.log("Cant select same type for rider")
+                } else {
+                    console.log("Can't select same type for rider");
+                    resetSelection();
                 }
             }
-
         }
-
-
-
-
     }
-  
+
+    const resetSelection = () => {
+        setDisableClick(true);
+        setTimeout(() => {
+            setDragonValue({ name: "", index: 0 });
+            setRiderValue({ name: "", index: 0 });
+            setFirstSelected(null);
+            setDisableClick(false);
+        }, 1000); 
+    }
 
     useEffect(() => {
+        const updatedFlippedCards: FLIPPED = { ...flippedCards };
 
-        const updatedFlippedCards = { ...flippedCards };
         Object.keys(flippedCards).forEach(index => {
-          if (!(index in dontShow)) {
-            updatedFlippedCards[index] = false;
-          }
+            const numericIndex = Number(index);
+            if (!(index in dontShow)) {
+                updatedFlippedCards[numericIndex] = false;
+            }
         });
         setFlippedCards(updatedFlippedCards);
-      }, [dontShow]); 
+    }, [dontShow]);
 
-      
-    
     return (
         <div className='div1'>
-            
             <h1 className="div2"> Match the Riders With their Dragons </h1>
             {
-            answer!==dragons.length ?
-            <div className="grid">
-            {shuffleCombined.map((item, index) => (
-                <div
-                key={index}
-                className={`flip-card ${ flippedCards[index] ? 'flipped' : ''}`}
-                onClick={dontShow[index] ? null  :() => handleSubmit(item.title,index)}
-                >
-                <div className="flip-card-inner">
-                    <div
-                    className="flip-card-front"
-                    style={{ backgroundImage: `url(${defaultCover1})` }}
-                    ></div>
-                    <div
-                    className={"flip-card-back"}
-                    style={{ backgroundImage: `url(${item.img})` }}
-                    ></div>
-                </div>
-                </div>
-            ))}
-
-            </div>
-            : <GameOver counts = {counter} time ={time}/>
+                answer !== dragons.length ?
+                    <div className="grid">
+                        {shuffleCombined.map((item: BASIC, index: number) => (
+                            <div
+                                key={index}
+                                className={`flip-card ${flippedCards[index] ? 'flipped' : ''}`}
+                                onClick={dontShow[index] ? undefined : () => handleSubmit(item.title, index)}
+                            >
+                                <div className="flip-card-inner">
+                                    <div
+                                        className="flip-card-front"
+                                        style={{ backgroundImage: `url(${defaultCover1})` }}
+                                    ></div>
+                                    <div
+                                        className="flip-card-back"
+                                        style={{ backgroundImage: `url(${item.img})` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    : <GameOver counts={counter} time={time} />
             }
-
-
         </div>
     )
 }

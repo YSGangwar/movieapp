@@ -2,7 +2,7 @@
 import React from 'react';
 import Lottie from 'react-lottie';
 import animationData from '../data/Animation - 1721813459789.json';
-import timeDifference from '../utils/calculateTIme';import { TimeToLeaveRounded } from '@mui/icons-material';
+import timeDifference from '../utils/calculateTIme';
 import { Navigate } from 'react-router-dom';
 ;
 const GameOver = ({counts, time }) => {
