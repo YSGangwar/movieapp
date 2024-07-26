@@ -1,13 +1,15 @@
-import React from 'react'
-import  { daemon,rhanerya,balerion, vermithor,vhagar,caraxes,drogon,syrax,meleys,aegon,baela,daenrys,rhaneys ,defaultCover1} from '../data/objects';
-import { Game } from './Game';
+import React, { useState ,lazy, Suspense} from 'react'
+import  { daemon,rhanerya,balerion, vermithor,vhagar,caraxes,drogon,syrax,meleys,aegon,baela,daenrys,rhaneys ,defaultCover1}  from '../data/objects';
+import { SkeletonCard } from '../components/SkeletonCard';
+import { Loading } from '../components/Loading';
+// import { Game } from './Game';
+
+const Game = lazy(() => import("./Game"));
 
 export const Radom = () => {
     const  jaehaerys = "https://i0.wp.com/wikiofthrones.com/wp-content/uploads/2022/10/Jaehaerys-I-Targaryens-rule-3885038.jpg?w=830&ssl=1";
 
-
-    const colors = ["red","blue","yellow","lime","orange","teal","purple","aqua"]
-
+    const colors = ["red","red","royalblue","lemon","orange","teal","purple","lavender"]
     const dragons = [
         { title: "Balerion", img: balerion },
         { title: "Vermithor", img: vermithor },
@@ -35,17 +37,19 @@ export const Radom = () => {
         }
         return array;
     }
-
     const combined = [...dragons,...riders];
     const shuffleCombined = shuffleArray([...combined]);
-
+   
     return(
-        <Game
+        <Suspense  fallback={<Loading/>}>
+
+          <Game
             riders={riders}
             dragons={dragons}
             shuffleCombined={shuffleCombined}
             colors={colors}
-        />
+            />
+        </Suspense>
     )
 }
 

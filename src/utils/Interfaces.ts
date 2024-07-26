@@ -15,4 +15,8 @@ interface FLIPPED {
 interface COLOR_PROPS {
     [key:number]:string;
 }
-export type  {CP,RIDERS,BASIC,FLIPPED,COLOR_PROPS};
+interface SECLECTED {
+    value:string,
+    index:number;
+}
+export type  {CP,RIDERS,BASIC,FLIPPED,COLOR_PROPS,SECLECTED};

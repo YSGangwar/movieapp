@@ -1,12 +1,18 @@
-import { useState,useEffect } from "react";
+import { useState,useEffect, Suspense ,lazy} from "react";
 import {defaultCover1} from '../data/objects';
-import GameOver from "../components/Gameover";
-import { CP , RIDERS , BASIC, FLIPPED, COLOR_PROPS} from '../utils/Interfaces'
-export const Game = (props:any) =>{
+// import GameOver from "../components/Gameover";
+import { CP , RIDERS , BASIC, FLIPPED, COLOR_PROPS,SECLECTED} from '../utils/Interfaces'
+import { SkeletonCard } from "../components/SkeletonCard";
+// import GameOver from "../components/Gameover";
+import { Loading } from "../components/Loading";
+
+const GameOver = lazy(() => import("../components/Gameover"));
+
+const Game = (props:any) =>{
     
     const [ answer , setCorrectAnswer]= useState(0);
   
-    const {riders,dragons , shuffleCombined , colors} = props;
+    const {riders,dragons , shuffleCombined , colors,demo} = props;
     // console.log(shuffleCombined)
     
     const [time ,setTime] = useState<Date>();
@@ -17,7 +23,7 @@ export const Game = (props:any) =>{
     // console.log(combinedPairs);
     const [flippedCards, setFlippedCards] = useState<FLIPPED>({});
     const [ dragonValue , setDragonValue] = useState({name:"",index:0});
-    const [ firstSelected , setFirstSelected] = useState<string | null >();
+    const [ firstSelected , setFirstSelected] = useState<SECLECTED | null>();
     const [ riderValue , setRiderValue] = useState({name:"",index:0});
     const [ dontShow , setDontShow ] = useState<FLIPPED>({});
     const [ showColor , setShowColor] = useState<COLOR_PROPS>({});
@@ -55,17 +61,17 @@ export const Game = (props:any) =>{
             setTime(startTime)
            
         }
-
-        handleFlip(index);
+        if(firstSelected?.index!==index)
+        {handleFlip(index);}
         setCounter(counter+1);
         console.log("Title",title);
         if(ifDragon(title)){
             if(!firstSelected){
                 setDragonValue({name:title,index:index});
-                setFirstSelected("dragon");
+                setFirstSelected({value:"dragon",index:index});
             }
             else {
-                if( firstSelected==="rider"){
+                if( firstSelected.value==="rider"){
                     console.log(riderValue);
                     if(riderValue.name === findRider(title)){
                         console.log("Match Successfull");
@@ -95,10 +101,10 @@ export const Game = (props:any) =>{
         else{
             if(!firstSelected){
                 setRiderValue({name:title,index:index});
-                setFirstSelected("rider");
+                setFirstSelected({value:"rider",index:index});
             }
             else {   
-                if( firstSelected==="dragon"){
+                if( firstSelected.value==="dragon"){
                     if(dragonValue.name === findDragon(title)){
                         
                         console.log("Match successfull again");
@@ -144,6 +150,7 @@ export const Game = (props:any) =>{
         setFirstSelected(null);
         setCounter(0);
         setShowColor({})
+        demo();
     }
 
     useEffect(() => {
@@ -159,22 +166,35 @@ export const Game = (props:any) =>{
         setFlippedCards(updatedFlippedCards);
       }, [dontShow]); 
 
+      const [showgameover , setShowGameOver] = useState(false);
+      useEffect(() => {
+        if (answer === dragons.length) {
+          const timer = setTimeout(() => {
+            setShowGameOver(true);
+          }, 5000);
+    
+          return () => clearTimeout(timer);
+        }
+      }, [answer, dragons.length]);
+
       
     
     return (
         <div className='div1'>
-            
             <h1 className="div2"> Match the Riders With their Dragons </h1>
             {
-            answer!==dragons.length ?
+                answer!==dragons.length ?
             <div className="grid">
             {shuffleCombined.map((item:BASIC, index:number) => (
+                // <Suspense fallback={<SkeletonCard/>}>
+
                 <div
                 key={index}
-                style={{borderRadius:"22px" , boxShadow: `0 4px 8px 0 ${showColor[index]}, 0 6px 20px 0 ${showColor[index]} `}}
-                className={`flip-card ${ flippedCards[index] ? 'flipped' : ''}`}
-                onClick={ dontShow[index] ? undefined  :() => handleSubmit(item.title,index)}
-                >
+                style={{borderRadius:"22px" 
+                    , boxShadow: `0 4px 8px 0 ${showColor[index]}, 0 6px 20px 0 ${showColor[index]} `}}
+                    className={`flip-card gradient-background ${ flippedCards[index] ? 'flipped' : ''}`}
+                    onClick={ (dontShow[index]) ? undefined  :() => handleSubmit(item.title,index)}
+                    >
                 <div className="flip-card-inner rounded-md">
                     <div
                     className="flip-card-front"
@@ -186,13 +206,18 @@ export const Game = (props:any) =>{
                     ></div>
                 </div>
                 </div>
+            // </Suspense>
             ))}
-
             </div>
-            : <GameOver counts = {counter} time ={time} clearStates={clearStates}/>
-            }
+            : 
+            <Suspense fallback={<Loading/>}>
+
+             {showgameover && <GameOver counts = {counter} time ={time} clearStates={clearStates}/>}
+            </Suspense>
+        }
 
 
         </div>
     )
 }
+export default Game;

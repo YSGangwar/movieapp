@@ -22,7 +22,7 @@ const GameOver = ({counts, time ,clearStates}) => {
       <h4> Total Clicks Taken :  {counts} </h4>
       <h4> Total Time Taken :{ timeDifference(endTime,time) } Seconds</h4>
       <button
-        onClick={clearStates}
+        onClick={()=>window.location.reload()}
         className='border-2 p-4 text-sm mt-4  rounded-[22px] bg-orange-600 border-black hover:scale-105 duration-300'
       > Play again </button>
       <Lottie options={defaultOptions} height={400} width={400} />
